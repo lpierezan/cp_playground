@@ -173,7 +173,7 @@ public class Treap<T>
         int n_less_than = node.Left != null ? node.Left.Size : 0;
         if (k <= n_less_than) return Kth_Element(node.Left, k);
         if (k == n_less_than + 1) return node.Value;
-        return Kth_Element(node.Right, n_less_than + 1);
+        return Kth_Element(node.Right, k - (n_less_than + 1));
     }
 
     int CountLessThan(TreapNode<T> node, T t)
