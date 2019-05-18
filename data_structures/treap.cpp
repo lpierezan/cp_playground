@@ -124,6 +124,15 @@ private:
         return kth_elem(n->r, k - (n_less+1));
     }
 
+    // # nodes s.t node.v < x
+    int count_lower(node *n, int x){
+        if(n == nullptr) return 0;
+        if(n->v >= x) return count_lower(n->l, x);
+        int ans = n->l == nullptr ?  0 : n->l->sz;
+        ans++;
+        return ans + count_lower(n->r, x);
+    }
+
     void clear(node *p) {
 		if (p == nullptr) return;
 		clear(p->l); clear(p->r);
@@ -158,6 +167,10 @@ public:
         return mp(true, kth_elem(root, k));
     }
 
+    int count_lower(int x){
+        return count_lower(root, x);
+    }
+
     ~treap(){clear(root);}
     void clear() { clear(root);}
 
@@ -169,19 +182,38 @@ public:
 };
 
 int main(){
-    // TODO test
-
+    // tested on https://www.spoj.com/problems/ORDERSET/
+    int nq, i, x;
+    char q_ch;
+    cin >> nq;
     treap t;
-    for(int i=0;i<10;i++)
-        t.insert(i);
 
-    t.erase(5);
-
-    for(int i=0;i<9;i++){
-        cout << "elem " << (i+1) << " = " << t.kth_elem(i+1).second << endl;
+    for(int iq=0;iq<nq;iq++){
+        cin >> q_ch;
+        cin >> x;
+        if(q_ch == 'I'){
+            if(t.find(x) == nullptr)
+                t.insert(x);
+        }else if (q_ch == 'D')
+        {
+            t.erase(x);
+        }else if (q_ch == 'K')
+        {
+            auto ans = t.kth_elem(x);
+            if(!ans.first)
+                cout << "invalid" << endl;
+            else
+            {
+                cout << ans.second << endl;
+            }
+        }else if (q_ch == 'C')
+        {
+            cout << t.count_lower(x) << endl;
+        }else
+        {
+            throw invalid_argument("query char: " + q_ch);
+        }
     }
-
-    cout << t.to_string() << endl;
 
     return 0;
 }
