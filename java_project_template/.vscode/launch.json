@@ -1,0 +1,13 @@
+{
+    "configurations": [        
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - Current File",
+            "request": "launch",
+            "mainClass": "${fileBasenameNoExtension}",
+            "projectName": "Contest",
+            "console": "integratedTerminal",
+            "cwd": "${fileDirname}"
+        }
+    ]
+}
