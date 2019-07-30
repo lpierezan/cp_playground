@@ -60,16 +60,34 @@ public class Solution {
 			return st.nextToken();
 		}
 		
-		int nextInt() {
+		int nextI() {
 			return Integer.parseInt(next());
 		}
-		
-		long nextLong() {
-			return Long.parseLong(next());
+
+		int[] nextI(int n) {
+			int v[] = new int[n];
+			for(int i=0;i<n;i++) v[i] = nextI();
+			return v;
 		}
 		
-		double nextDouble() {
+		long nextL() {
+			return Long.parseLong(next());
+		}
+
+		long[] nextL(int n) {
+			long v[] = new long[n];
+			for(int i=0;i<n;i++) v[i] = nextL();
+			return v;
+		}
+		
+		double nextD() {
 			return Double.parseDouble(next());
+		}
+
+		double[] nextD(int n) {
+			double v[] = new double[n];
+			for(int i=0;i<n;i++) v[i] = nextD();
+			return v;
 		}
 	}
 }
