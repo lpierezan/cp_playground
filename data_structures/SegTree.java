@@ -23,23 +23,21 @@ class SegTree
         }
     }
 
-    int[] v;
     Node root = null;
     int n;
 
     SegTree(int[] v)
     {
-        this.v = v;
         n = v.length;
-        root = init(0, n-1);
+        root = init(v, 0, n-1);
     }
 
-    private Node init(int l, int r) {
+    private Node init(int[] v, int l, int r) {
         if(l == r)
             return new Node(v[l]);
         int mid = l + (r-l)/2;
-        Node ln = init(l,mid);
-        Node rn = init(mid+1,r);
+        Node ln = init(v, l,mid);
+        Node rn = init(v, mid+1,r);
         return new Node(ln,rn);
     }
 
