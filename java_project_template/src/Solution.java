@@ -90,4 +90,9 @@ public class Solution {
 			return v;
 		}
 	}
+
+	class Pair{
+		int a,b;
+		Pair(int a, int b){ this.a = a; this.b = b;}
+	}
 }
