@@ -38,5 +38,28 @@ class Strings{
         }
         return hitL.stream().mapToInt(Integer::intValue).toArray();
     }
+
+    static int[][] prefixAutomaton(String p){
+        //dfa[i][c] = new state when in state = i and receive char = 'a' + c
+        //state i represents p[0...i] and last state (#) represents match
+        p += '#';
+        int n = p.length();
+        int nL = 'z' - 'a' + 1;
+        int dfa[][] = new int[n][nL];
+        int pi[] = prefixFunction(p);
+        for(int i=0;i<n;i++){
+            for(int c=0;c<nL;c++){
+                if(i > 0 && c+'a' != p.charAt(i)){
+                    dfa[i][c] = dfa[pi[i-1]][c];
+                }else{
+                    if(c+'a' == p.charAt(i))
+                        dfa[i][c] = i + 1;
+                    else
+                        dfa[i][c] = 0; // i == 0 and not match
+                }
+            }
+        }
+        return dfa;
+    }
     
 }
