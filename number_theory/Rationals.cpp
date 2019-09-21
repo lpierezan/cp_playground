@@ -8,7 +8,7 @@ typedef vector<vector<int>> vvi;
 typedef pair<int,int> pii;
 typedef long long ll;
 
-class rational{
+class Rationals{
 public:
 
     static int mdc(int a, int b){
@@ -69,7 +69,7 @@ int main(){
     while(n--){
         cout << "Enter p and q " << endl;
         cin >> p >> q;
-        vi ans = rational::continued_fraction(p, q);
+        vi ans = Rationals::continued_fraction(p, q);
         cout << p << "/" << q << " = " << double(p)/q << endl;
         cout << "continued fraction: ";
         for(auto x : ans){
@@ -77,7 +77,7 @@ int main(){
         }
         cout << endl;
         cout << "convergents: " << endl;
-        rational::convergents(ans);
+        Rationals::convergents(ans);
         cout << endl;
     }
     

@@ -1,29 +1,12 @@
 
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <queue>
-#include <stack>
-#include <list>
-#include <string>
-#include <algorithm>
-#include <unordered_set>
-#include <unordered_map>
-#include <set>
-#include <map>
-#include <random>
-#include <functional>
-#include <tuple>
-#include <typeinfo>
-#include <assert.h> 
-#include <random>
+#include <bits/stdc++.h>
 
 using namespace std;
 #define mp make_pair
 typedef vector<int> vi;
 typedef pair<int, int> pii;
 const int INF = (1 << 30);
-typedef long long int li;
+typedef long long ll;
 
 class SegTree
 {
@@ -45,9 +28,9 @@ class SegTree
 
       public:
         Node *ln, *rn;
-        li x, add;
+        ll x, add;
         
-        Node(li x){
+        Node(ll x){
             this->x = x;
             this->add = 0;
             this->ln = this->rn = nullptr;
@@ -72,7 +55,7 @@ class SegTree
         }
     };
     
-    Node* init(vector<li> &v, int l, int r)
+    Node* init(vector<ll> &v, int l, int r)
     {
         if (l == r)
             return new Node(v[l]);
@@ -83,7 +66,7 @@ class SegTree
         return new Node(ln, rn);
     }
 
-    li merge_query(li *lret, li *rret){
+    ll merge_query(ll *lret, ll *rret){
         //assert(lret != nullptr || rret != nullptr);
 
         if(lret == nullptr)
@@ -95,7 +78,7 @@ class SegTree
     }
 
     //query interval [i,j] in current node [l, r]
-    li query(Node *curr, int l, int r, int i, int j)
+    ll query(Node *curr, int l, int r, int i, int j)
     {
         curr->norm();
         
@@ -104,22 +87,22 @@ class SegTree
 
         int k = l + (r - l) / 2;
 
-        li *lret = nullptr, *rret = nullptr;
+        ll *lret = nullptr, *rret = nullptr;
 
         //[l,k] \inter [i,j]
         if (k >= i && l <= j)
-            lret = new li(query(curr->ln, l, k, i, j));
+            lret = new ll(query(curr->ln, l, k, i, j));
         
         //[k+1,r] \inter [i,j]
         if (k + 1 <= j && r >= i)
-            rret = new li(query(curr->rn, k+1,r,i,j));
+            rret = new ll(query(curr->rn, k+1,r,i,j));
         
         //merge query
         auto ret = merge_query(lret, rret);
         return ret;
     }
 
-    void add(Node *curr, li k, int i, int j, int l, int r){
+    void add(Node *curr, ll k, int i, int j, int l, int r){
         if(j < l || i > r) return;
         
         if(l >= i && r <= j){
@@ -145,7 +128,7 @@ class SegTree
 
   public:
 
-    SegTree(vector<li> &v){
+    SegTree(vector<ll> &v){
         this->n = v.size();
         this->root = init(v, 0, n-1);
     }
@@ -153,21 +136,21 @@ class SegTree
     ~SegTree(){ clean(root); }
 
     // max element in [i,j]
-    li query(int i = 0, int j = -1)
+    ll query(int i = 0, int j = -1)
     {
         if(j == -1) j = n-1;
         return query(root, 0, n-1, i, j);
     }
 
     // adds k in for all values in [i,j]
-    void add(li k, int i, int j = -1){
+    void add(ll k, int i, int j = -1){
         if(j == -1) j = n-1;
         add(root, k, i, j, 0, n-1);
     }
   
 };
 
-void print_v(vector<li> v){
+void print_v(vector<ll> v){
     cout << "v: ";
     for_each(v.begin(), v.end(), [](auto x) -> void {cout << x << " ";});
     cout << endl;
@@ -183,15 +166,15 @@ void test_code_1(){
     cout << "Starting tests" << endl;
     
     default_random_engine generator;
-    uniform_int_distribution<li> vdist(0, maxnum);
+    uniform_int_distribution<ll> vdist(0, maxnum);
     uniform_int_distribution<int> idist(0, vsize-1);    
     bernoulli_distribution qdist(percent_add);
 
     for(int _ = 0; _ < ntest; _++){
         cout << "Test " << _ << endl;
         
-        vector<li> v(vsize);
-        generate(v.begin(), v.end(), [&]() ->  li { return vdist(generator);});
+        vector<ll> v(vsize);
+        generate(v.begin(), v.end(), [&]() ->  ll { return vdist(generator);});
 
         //print_v(v);
 
@@ -207,9 +190,9 @@ void test_code_1(){
 
             if(qdist(generator)){
                 //add
-                li add = vdist(generator);
+                ll add = vdist(generator);
                 t.add(add, iq, jq);
-                transform(&v[iq], &v[jq+1], &v[iq], [=](li x) -> li {return x + add;});
+                transform(&v[iq], &v[jq+1], &v[iq], [=](ll x) -> ll {return x + add;});
                 cout << "query: add " << add << " in [" << iq << "," << jq << "]" << endl;
                 //print_v(v);
             }else{

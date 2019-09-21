@@ -8,10 +8,10 @@ typedef vector<vector<int>> vvi;
 typedef pair<int,int> pii;
 typedef long long ll;
 
-class sparse_table{
+class SparseTable{
 public:
     vvi dp; //dp[i][j] = max(v[i] .. v[i + 2^j -1])
-    sparse_table(vi& v){
+    SparseTable(vi& v){
         int n = v.size();
         int k = log2(n) + 2;
         dp = vvi(n, vi(k, 0));

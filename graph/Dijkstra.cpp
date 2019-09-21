@@ -8,7 +8,7 @@ typedef vector<vector<int>> vvi;
 typedef pair<int,int> pii;
 typedef long long ll;
 
-class dijkstra{
+class Dijkstra{
 public:
     static vi solve(vector<vector<pii>> &g, int s, int target = -1){
         //g[v] = list of (u,w) , where v->u with weight w.
@@ -76,7 +76,7 @@ int main(){
         }
 
         vi dist;
-        dist = dijkstra::solve(g, s, t);
+        dist = Dijkstra::solve(g, s, t);
         if(dist[t] < 0){
             cout << "NONE" << endl;
         }else{

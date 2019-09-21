@@ -8,7 +8,7 @@ typedef vector<vector<int>> vvi;
 typedef pair<int,int> pii;
 typedef long long ll;
 
-class treap{
+class Treap{
     /* Min-Priority heap property
      * Left Subtree => less than
      * Right Subtree => greather or equal
@@ -31,7 +31,7 @@ public:
         }
      };
      node *root = nullptr;
-     treap() {}
+     Treap() {}
 
 private:
 	void rr(node *&p) {
@@ -171,7 +171,7 @@ public:
         return count_lower(root, x);
     }
 
-    ~treap(){clear(root);}
+    ~Treap(){clear(root);}
     void clear() { clear(root);}
 
     string to_string(){
@@ -186,7 +186,7 @@ int main(){
     int nq, i, x;
     char q_ch;
     cin >> nq;
-    treap t;
+    Treap t;
 
     for(int iq=0;iq<nq;iq++){
         cin >> q_ch;

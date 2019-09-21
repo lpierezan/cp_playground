@@ -8,7 +8,7 @@ typedef vector<vector<int>> vvi;
 typedef pair<int,int> pii;
 typedef long long ll;
 
-class trie{
+class Trie{
 public:
     class node{
     public:
@@ -25,9 +25,9 @@ public:
     };
     node *root;
 
-    trie(){ root = new node(); }
+    Trie(){ root = new node(); }
 
-    ~trie(){ delete root; }
+    ~Trie(){ delete root; }
 
     void insert(vector<char> word){
         auto curr = root;
@@ -61,7 +61,7 @@ public:
 };
 
 int main(){
-    trie t;
+    Trie t;
     t.insert("hello!");
     t.insert("world.");
     t.insert("hell");

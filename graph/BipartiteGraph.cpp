@@ -7,7 +7,7 @@ typedef vector<int> vi;
 typedef pair<int, int> pii;
 typedef long long ll;
 
-class bipartite_graph
+class BipartiteGraph
 {
     /* 
         Bipartide graph with n vertices on the left and m vertices on the right.
@@ -19,7 +19,7 @@ public:
     vector<vector<int>> g;
     int n, m;
 
-    bipartite_graph(int n, int m) : n(n), m(m)
+    BipartiteGraph(int n, int m) : n(n), m(m)
     {
         for (int i = 0; i < n + m; i++)
             g.push_back(vi());
@@ -113,7 +113,7 @@ int main()
     }
     
     
-    bipartite_graph g(n,m);
+    BipartiteGraph g(n,m);
 
     for(i=0;i<n;i++){
         for(j=0;j<m;j++){
