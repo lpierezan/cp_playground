@@ -30,14 +30,12 @@ vector<pair<long,int>> fac(ll n){
     return ret;
 }
 
-ll expMod(ll p, ll exp, ll mod){
+ll expMod(ll a, ll exp, ll mod){
     if(exp == 0) return 1;
-
-    ll pp = expMod(p, exp/2, mod);
-    pp = (pp*pp)%mod;
-    if(exp%2 == 1)
-        pp = (pp*p)%mod;
-    return pp;
+    ll pa = expMod(a, exp/2, mod);
+    pa = (pa*pa)%mod;
+    if(exp%2 == 1) pa = (pa*a)%mod;
+    return pa;
 }
 
 int main(){
