@@ -21,6 +21,13 @@ public:
         return b;
     }
 
+    static pair<int, pii> extGCD(int a, int b){
+        if(b == 0) return {a , {1, 0}};
+        auto tmp = extGCD(b, a%b);
+        pair<int, pii> ans = {tmp.first , {tmp.second.second, tmp.second.first - (a/b)*tmp.second.second}};
+        return ans;
+    }
+
     static vi continued_fraction(int p, int q){
         // p/q = continued fraction: [a0; a1, a2, ... , 1]
         vi ans;
