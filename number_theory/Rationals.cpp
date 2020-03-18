@@ -11,23 +11,6 @@ typedef long long ll;
 class Rationals{
 public:
 
-    static int mdc(int a, int b){
-        int tmp;
-        while(a%b != 0){
-            tmp = a;
-            a = b;
-            b = tmp%b;
-        }
-        return b;
-    }
-
-    static pair<int, pii> extGCD(int a, int b){
-        if(b == 0) return {a , {1, 0}};
-        auto tmp = extGCD(b, a%b);
-        pair<int, pii> ans = {tmp.first , {tmp.second.second, tmp.second.first - (a/b)*tmp.second.second}};
-        return ans;
-    }
-
     static vi continued_fraction(int p, int q){
         // p/q = continued fraction: [a0; a1, a2, ... , 1]
         vi ans;
@@ -76,6 +59,7 @@ int main(){
     while(n--){
         cout << "Enter p and q " << endl;
         cin >> p >> q;
+
         vi ans = Rationals::continued_fraction(p, q);
         cout << p << "/" << q << " = " << double(p)/q << endl;
         cout << "continued fraction: ";
