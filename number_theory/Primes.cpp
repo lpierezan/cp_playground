@@ -12,7 +12,7 @@ typedef long long ll;
 
 ll expMod(ll a, ll exp, ll mod){
     if(exp == 0) return 1;
-    ll pa = expMod(a, exp/2, mod);
+    __int128_t pa = expMod(a, exp/2, mod);
     pa = (pa*pa)%mod;
     if(exp%2 == 1) pa = (pa*a)%mod;
     return pa;
@@ -182,6 +182,56 @@ class WheelSieve{
     }
 };
 
+class MillerRabin{
+    public:
+    static bool checkComposite(ll n, ll a, ll d, int s){
+        /* 
+            assumes:
+            n odd >= 5
+            n-1 = 2^s * d , s > 0
+
+            if n is prime =>
+            a^d = 1 (mod n), or
+            a^(2^r * d) = -1, for 0 <= r <= s-1
+        */
+        ll x = expMod(a, d, n);
+        if(x == 1 || x == n-1) return false;
+        for(int r=1;r<s;++r){
+            x = (__int128_t(x)*x)%n; // overflow issue
+            if(x==n-1) return false;
+        }
+        return true;
+    }
+
+    static bool isPrime(ll n,const vi &bases){
+        if(n <= 4) return (n==2) || (n==3);
+        if(n%2 == 0) return false;
+
+        // n-1 = 2^s * d
+        ll d = n-1;
+        int s = 0;
+        while(d%2 ==0 ){
+            d /= 2;
+            s++;
+        }
+        
+        // valid base: 2 <= base <= n-2
+        for(auto a : bases){
+            a = (a-2)%(n-3) + 2;
+            if(checkComposite(n , a, d, s)) return false;
+        }
+        return true;
+    }
+
+    static bool isPrime(int n){
+        return isPrime(n, {2,3,5,7});
+    }
+    static bool isPrime(ll n){
+        return isPrime(n, {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37});
+    }
+
+};
+
 vector<pair<ll,int>> fac(ll n, const vi &primeList){
     // primeList should cover sqrt(n)
     // O(pi(sqrt(n))) ~ O(sqrt(n)/log(sqrt(n)))
@@ -208,6 +258,22 @@ vector<pair<ll,int>> fac(ll n, const vi &primeList){
         ret.push_back({n,1});
     }
     return ret;
+}
+
+void testMillerRabin(){
+    int n = 10000000;
+    WheelSieve W({2,3,5,7,11});
+    vi primeL;
+    W.sieve(n, primeL);
+    
+    auto begin = std::chrono::steady_clock::now();
+    for(int i=0;i<=n;i++){
+        assert(W.isPrime(i) == MillerRabin::isPrime(i));
+    }
+    auto end = std::chrono::steady_clock::now();
+    cout << "Time difference = " << chrono::duration_cast<chrono::milliseconds>(end - begin).count() << "[ms]" << endl;
+
+    cout << "ok miller rabin" << endl;
 }
 
 void testSieve(){
@@ -240,9 +306,10 @@ void testSieve(){
         assert(isP[i] == W.isPrime(i));
     }
     
-    cout << "ok" << endl;
+    cout << "ok sieve" << endl;
 }
 
 int main(){
-    testSieve();
+    //testSieve();
+    testMillerRabin();
 }
