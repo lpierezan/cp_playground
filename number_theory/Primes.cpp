@@ -4,7 +4,9 @@ using namespace std;
 #define mp make_pair
 #define all(x) (x).begin(), (x).end()
 typedef vector<int> vi;
+typedef vector<long long> vll;
 typedef vector<vector<int>> vvi;
+typedef vector<vector<long long>> vvl;
 typedef pair<int,int> pii;
 typedef long long ll;
 
@@ -89,6 +91,97 @@ void linearSieve(int n, vi &minP, vi &primeList){
     }
 }
 
+class WheelSieve{
+    public:
+    int b, s;
+    vi baseL;
+    vi r, inc, rI;
+    vector<bool> isP;
+    vector<bool> isBase;
+
+    WheelSieve(const vi& firstPrimes): baseL{firstPrimes}{
+        // baseL = first k primes
+        sort(all(baseL));
+        isBase.resize(baseL.back()+1, false);
+        
+        b = 1; int i;
+        for(i=0;i<baseL.size();i++){
+            b *= baseL[i];
+            isBase[baseL[i]] = true;
+        }
+        
+        for(i=1;i<b;i++){
+            bool ok = true; //gcd(i, b) == 1;
+            for(auto p : baseL){
+                if(i%p == 0){
+                    ok = false;
+                    break;
+                }
+            }
+            if(ok) r.push_back(i);
+        }
+        
+        s = r.size();
+        inc.resize(s);
+        rI.resize(b,-1);
+        for(i=0;i<s;i++){
+            inc[i] = (r[(i+1)%s] - r[i] + b)%b;
+            rI[r[i]] = i;
+        }
+    }
+
+    int num(int i){
+        return (i/s)*b + r[i%s];
+    }
+
+    int idx(int x){
+        return (x/b)*s + rI[x%b];
+    }
+
+    void sieve(int n, vi &primeL){
+        int i, size = (n/b)*s;
+        for(i=0;i < s && r[i] <= (n%b);++i, ++size);
+        if(isP.size() != size) isP.resize(size);
+        fill(all(isP), true);
+        isP[0] = false; //num(0) = 1
+        primeL.clear(); primeL.reserve((n/32));
+        for(auto p : baseL) primeL.push_back(p);
+
+        ll p; int ib;
+        vi incX(s);
+        for(i = ib = 1, p = r[i];(i<size) && (p*p <= n); p += inc[ib], ++i, ib = (ib==s-1?0:ib+1)){
+            if(!isP[i]) continue;
+            //p is prime
+            primeL.push_back(p);
+            int j, currI, prevI = -1; ll pk, p2 = p*p;
+            for(j = ib, pk = p2; pk <= n; pk += inc[j]*p, j = (j==s-1 ? 0:j+1)){
+                currI = idx(pk);
+                isP[currI] = false;
+                if(prevI != -1) incX[(j-1==-1?s-1:j-1)] = currI - prevI;
+                prevI = currI;
+                if(j == ib && (pk > p2)) break;
+            }
+            if(pk <= n){
+                currI += incX[j];
+                j = (j==s-1 ? 0:j+1);
+                for(; currI < size; currI += incX[j], j = (j==s-1 ? 0:j+1)){
+                    isP[currI] = false;
+                }
+            }
+        }
+        // tail primes > sqrt(n) : only needed for primeL
+        for(;i<size;p += inc[ib], ++i, ib = (ib==s-1?0:ib+1)){
+            if(isP[i]) primeL.push_back(p);
+        }
+    }
+
+    bool isPrime(int x){
+        if(x <= baseL.back()) return isBase[x];
+        if(rI[x%b] < 0) return false;
+        return isP[idx(x)];
+    }
+};
+
 vector<pair<ll,int>> fac(ll n, const vi &primeList){
     // primeList should cover sqrt(n)
     // O(pi(sqrt(n))) ~ O(sqrt(n)/log(sqrt(n)))
@@ -117,53 +210,39 @@ vector<pair<ll,int>> fac(ll n, const vi &primeList){
     return ret;
 }
 
-vector<pair<long,int>> fac(ll n){
-    // O(sqrt(n))
-    vector<pair<long,int>> ret;
-    if(n <= 1){
-        return ret;
+void testSieve(){
+    int n = 100000000;
+    
+    auto begin = std::chrono::steady_clock::now();
+    WheelSieve W({2,3,5,7,11});
+    vi primeL;
+    W.sieve(n, primeL);
+    //cout << primeL.size() << endl;
+    auto end = std::chrono::steady_clock::now();
+    cout << "Time difference = " << chrono::duration_cast<chrono::milliseconds>(end - begin).count() << "[ms]" << endl;
+
+    begin = std::chrono::steady_clock::now();
+    vi primeL2; 
+    vector<bool> isP;
+    sieve(n, primeL2,isP);
+    //vi minP;
+    //linearSieve(n, minP, primeL2);
+    end = std::chrono::steady_clock::now();
+    cout << "Time difference = " << chrono::duration_cast<chrono::milliseconds>(end - begin).count() << "[ms]" << endl;
+
+    assert(primeL.size() == primeL2.size());
+
+    for(int i=0;i<primeL.size();i++){
+        assert(primeL[i] == primeL2[i]);
     }
-    int j = 1;
-    for(ll p = 2; p*p <= n; p += j){
-        int exp = 0;
-        while(n%p == 0){
-            n /= p;
-            exp++;
-        }
-        if(exp != 0)
-            ret.push_back(mp(p, exp));
-        if(p > 2) j = 2;
+
+    for(int i=0;i<=n;i++){
+        assert(isP[i] == W.isPrime(i));
     }
-    if(n > 1){
-        ret.push_back(mp(n,1));
-    }
-    return ret;
+    
+    cout << "ok" << endl;
 }
 
 int main(){
-    
-    while(true){
-        ll l,r;
-        cin >> l >> r;
-        int n = sqrt(r) + 1;
-        vi primeList; vector<bool> isP;
-        sieve(n, primeList, isP);
-        
-        cout << "fist 10 primes:" << endl;
-        for(int i=0;i<10 && i < primeList.size();i++) cout << primeList[i] << " ";
-        cout << endl;
-
-        cout << "in the interval" << endl;
-        vector<bool> isPB;
-        blockSieve(l,r,primeList,isPB);
-        int cnt = 0;
-        for(int i=l;i<=r;i++){
-            if(isPB[i-l]){
-                cnt++;
-                cout << i << " ";
-            }
-            if(cnt == 10) break;
-        }
-        cout << endl;
-    }
+    testSieve();
 }
