@@ -10,6 +10,8 @@ typedef vector<vector<long long>> vvl;
 typedef pair<int,int> pii;
 typedef long long ll;
 
+template<class T> T gcd(T a, T b) { return b ? gcd(b, a % b) : a; }
+
 ll expMod(ll a, ll exp, ll mod){
     if(exp == 0) return 1;
     __int128_t pa = expMod(a, exp/2, mod);
@@ -276,6 +278,45 @@ void testMillerRabin(){
     cout << "ok miller rabin" << endl;
 }
 
+ll brentFac(ll n, ll x0 = 2, ll c=1){
+    // f(x) = (x^2 + c)%mod
+    auto f = [](ll x, ll c, ll mod){return ( (__int128_t(x)*x)%mod + c)%mod;};
+    assert(n > 1);
+
+    ll x = x0;
+    ll g = 1;
+    ll q = 1;
+    ll xs, y;
+
+    // multiply batchS numbers in sequence
+    int batchS = 128;
+    int p2 = 1;
+    while (g == 1) {
+        y = x;
+        for (int i = 1; i < p2; i++)
+            x = f(x, c, n);
+
+        int k = 0;
+        while (k < p2 && g == 1) {
+            xs = x;
+            for (int i = 0; i < batchS && i < p2 - k; i++) {
+                x = f(x, c, n);
+                q = (__int128_t(q)*abs(y-x))%n;
+            }
+            g = gcd(q, n);
+            k += batchS;
+        }
+        p2 *= 2;
+    }
+    if (g == n) {
+        do {
+            xs = f(xs, c, n);
+            g = gcd(abs(xs - y), n);
+        } while (g == 1);
+    }
+    return g;
+}
+
 void testSieve(){
     int n = 100000000;
     
@@ -309,7 +350,32 @@ void testSieve(){
     cout << "ok sieve" << endl;
 }
 
+void testBrentFac(){
+    while(true){
+        ll n;
+        cin >> n;
+        int n_try = 10;
+        ll fac = n;
+        int x0 = 2;
+        int c = 1;
+        for(int i=0;i<n_try && fac == n;i++){
+            fac = brentFac(n, x0, c);
+            x0 = rand()%100;
+            c = rand()%100;
+        }
+        if(fac < n)
+            cout << "found! " << fac << endl;
+        else
+        {
+            cout << "not found :(" << endl;
+            cout << "isPrime: " << MillerRabin::isPrime(n) << endl;
+        }
+        
+    }
+}
+
 int main(){
     //testSieve();
-    testMillerRabin();
+    //testMillerRabin();
+    testBrentFac();
 }
