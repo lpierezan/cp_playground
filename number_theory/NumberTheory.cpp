@@ -8,18 +8,7 @@ typedef vector<vector<int>> vvi;
 typedef pair<int,int> pii;
 typedef long long ll;
 
-static int gcd(int a, int b){
-    int tmp;
-    if(b == 0)
-        return a;
-        
-    while(a%b != 0){
-        tmp = a;
-        a = b;
-        b = tmp%b;
-    }
-    return b;
-}
+template<class T> T gcd(T a, T b) { return b ? gcd(b, a % b) : a; }
 
 static int extGCD(int a, int b, int& x, int& y){
     // gcd is negative if min(a,b) < 0 and |min(a,b)| > |max(a,b)|
@@ -63,6 +52,7 @@ int main(){
 
         int x,y;
         int g = extGCD(p,q,x,y);
+        assert(g == gcd(p,q));
         cout << p << " % " << q << " = " << p%q << endl;
         cout << p << " / " << q << " = " << p/q << endl;
         cout << p << " * " << x << " + " << q << " * " << y << " = " << g << endl;
