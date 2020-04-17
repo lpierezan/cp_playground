@@ -262,22 +262,6 @@ vector<pair<ll,int>> fac(ll n, const vi &primeList){
     return ret;
 }
 
-void testMillerRabin(){
-    int n = 10000000;
-    WheelSieve W({2,3,5,7,11});
-    vi primeL;
-    W.sieve(n, primeL);
-    
-    auto begin = std::chrono::steady_clock::now();
-    for(int i=0;i<=n;i++){
-        assert(W.isPrime(i) == MillerRabin::isPrime(i));
-    }
-    auto end = std::chrono::steady_clock::now();
-    cout << "Time difference = " << chrono::duration_cast<chrono::milliseconds>(end - begin).count() << "[ms]" << endl;
-
-    cout << "ok miller rabin" << endl;
-}
-
 ll brentFac(ll n, ll x0 = 2, ll c=1){
     // f(x) = (x^2 + c)%mod
     auto f = [](ll x, ll c, ll mod){return ( (__int128_t(x)*x)%mod + c)%mod;};
@@ -315,6 +299,23 @@ ll brentFac(ll n, ll x0 = 2, ll c=1){
         } while (g == 1);
     }
     return g;
+}
+
+// ========================  TESTS ==========================
+void testMillerRabin(){
+    int n = 10000000;
+    WheelSieve W({2,3,5,7,11});
+    vi primeL;
+    W.sieve(n, primeL);
+    
+    auto begin = std::chrono::steady_clock::now();
+    for(int i=0;i<=n;i++){
+        assert(W.isPrime(i) == MillerRabin::isPrime(i));
+    }
+    auto end = std::chrono::steady_clock::now();
+    cout << "Time difference = " << chrono::duration_cast<chrono::milliseconds>(end - begin).count() << "[ms]" << endl;
+
+    cout << "ok miller rabin" << endl;
 }
 
 void testSieve(){
