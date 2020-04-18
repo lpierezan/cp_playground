@@ -69,6 +69,39 @@ void modularInvRange(int n, int pMod, vi &inv){
     }
 }
 
+int phiF(int n){
+    // runtime O(sqrt(n))
+    if(n <= 1) return n;
+    int ans = n;
+    for(int i = 2; i*i <= n; i++){
+        if(n%i == 0){
+            while(n%i == 0)
+                n /= i;
+
+            // ans = ans * (1 - 1/p)
+            ans -= ans/i;
+        }
+    }
+    if(n > 1)
+        ans -= ans/n;
+    return ans;
+}
+
+void phiRange(int n, vi& phi) {
+    phi = vi(n + 1);
+    phi[0] = 0;
+    phi[1] = 1;
+    for (int i = 2; i <= n; i++)
+        phi[i] = i;
+
+    for (int i = 2; i <= n; i++) {
+        if (phi[i] == i) {
+            for (int j = i; j <= n; j += i)
+                phi[j] -= phi[j] / i;
+        }
+    }
+}
+
 
 // =============== TEST ===================
 void testInvRange(){
@@ -88,10 +121,18 @@ void testInvRange(){
 void testGCD(){
     // 1276111009 1655801091    
     int p, q;
-    int n = 100;
+    int n = 10;
+    srand(time(nullptr));
     while(n--){
-        cout << "Enter p and q " << endl;
-        cin >> p >> q;
+        //cout << "Enter p and q " << endl;
+        //cin >> p >> q;
+        {
+            int c = 1e9;
+            p = -c + rand()%(2*c);
+            q = -c + rand()%(2*c);
+            cout << "p = " << p << " q = " << q << endl;
+        }
+        
 
         int x,y;
         int g = extGCD(p,q,x,y);
@@ -102,26 +143,45 @@ void testGCD(){
 
         for(int i=0;i<10;i++){
             using num = ll;
-            num b = rand()%q;
+            num qq = abs(q);
+            num b = rand()%qq;
             // p*x = b (mod q)
-            cout << p << "* x = " << b << " mod(" <<q<< ")" << endl;
+            cout << p << "* x = " << b << " mod(" <<qq<< ")" << endl;
             num sol;
-            if(!modularEqSolver(num(p), num(b), num(q), sol)){
+            if(!modularEqSolver(num(p), num(b), qq , sol)){
                 cout << "no solution" << endl;
             }else
             {
                 cout << "solution: " << sol << endl;
-                assert((num(p)*sol)%q == b);
+                auto pp = (num(p)%qq + qq)%qq;
+                assert((pp*sol)%qq == b);
             }
         }
 
-        cout << endl;
+        cout << "gcd. modular eq. solver ok " << endl;
     }
+}
+
+
+void testPhi(){
+    int n = 100;
+    vi phi;
+    phiRange(n, phi);
+    for(int i = 1;i<=n;i++){
+        assert(phi[i] = phiF(i));
+
+        int cnt = 0;
+        for(int j = 1;j<=i;j++)
+            if(gcd(i,j) == 1) cnt++;
+        assert(phi[i] == cnt);
+    }
+    cout << "phi ok" << endl;
 }
 
 int main(){
     
-    testInvRange();
+    testPhi();
+    //testInvRange();
     //testGCD();
     
     return 0;
