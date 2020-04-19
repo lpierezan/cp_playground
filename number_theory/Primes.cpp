@@ -12,12 +12,14 @@ typedef long long ll;
 
 template<class T> T gcd(T a, T b) { return b ? gcd(b, a % b) : a; }
 
-ll expMod(ll a, ll exp, ll mod){
-    if(exp == 0) return 1;
-    __int128_t pa = expMod(a, exp/2, mod);
-    pa = (pa*pa)%mod;
-    if(exp%2 == 1) pa = (pa*a)%mod;
-    return pa;
+ll expMod(ll a, ll b, ll mod){
+    ll ans = 1;
+    while(b){
+        if(b&1) ans = (ans*a)%mod;
+        a = (a*a)%mod;
+        b >>= 1;
+    }
+    return ans;
 }
 
 void sieve(int n, vi &primeList, vector<bool> &isP){
