@@ -1,0 +1,46 @@
+{
+    "telemetry.enableTelemetry": false,
+    "telemetry.enableCrashReporter": false,
+    "python.pythonPath": "/home/lucas/anaconda3/bin/python",
+    "python.dataScience.sendSelectionToInteractiveWindow": true,
+    "C_Cpp.updateChannel": "Insiders",
+    "npm.fetchOnlinePackageInfo": false,
+
+    "io-run.executorMap.common": {
+        ".cpp": {
+          // run chary
+          "compileCmd": "g++ -g -std=gnu++17 -Wall -Wextra -Wshadow ${codeFile} -o ${codeFileNoExt} -fsanitize=address -fsanitize=undefined -D_GLIBCXX_DEBUG",
+          // run fast
+          //"compileCmd": "g++ -g -O2 -std=gnu++17 -Wshadow -Wall ${codeFile} -o ${codeFileNoExt}",
+          "runCmd": "${dirCodeFileNoExt} <${inputFile} >${outputFile}",
+          "cleanupCmd": "rm ${codeFileNoExt}",
+          "errorTracer": "gdb"
+        },
+        ".java": {
+          "compileCmd": "javac -encoding UTF-8 ${codeFile}",
+          "runCmd": "java ${codeFileNoExt} <${inputFile} >${outputFile}",
+          "cleanupCmd": "rm ${codeFileNoExt.class}"
+        },
+        ".py": {
+          "runCmd": "python ${codeFile} <${inputFile} >${outputFile}"
+        }
+    },
+    "explorer.confirmDelete": false,
+    "window.zoomLevel": 0,
+    "editor.suggestSelection": "first",
+    "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+    "java.configuration.checkProjectSettingsExclusions": false,
+    "java.errors.incompleteClasspath.severity": "ignore",
+    "python.jediEnabled": false,
+    "[python]": {},
+    "diffEditor.ignoreTrimWhitespace": false,
+    "explorer.confirmDragAndDrop": false,
+    "io-run.cleanupAfterRun": false,
+    "io-run.enableAnalytic": false,
+    "io-run.showRunIconInEditorTitleMenu": false,
+    "io-run.showInputFileOnWrongAnswer": false,
+    "[cpp]": {
+    
+    }
+    
+}

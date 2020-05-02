@@ -1,0 +1,43 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "shell",
+      "label": "g++ build active file",
+      "command": "/usr/bin/g++",
+      "args": [
+        "-std=c++17",
+        "-Wshadow",
+        "-Wall",
+        "-g",
+        "-o",
+        "${fileDirname}/${fileBasenameNoExtension}",
+        "${file}",
+        // chary mode
+        "-fsanitize=address", 
+        "-fsanitize=undefined",
+        "-D_GLIBCXX_DEBUG",
+      ],
+      "options": {
+        "cwd": "/usr/bin"
+      },
+      "problemMatcher": [
+        "$gcc"
+      ],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "type": "shell",
+      "label": "run c++",
+      "command": "${fileDirname}/${fileBasenameNoExtension}",
+      "args": [
+      ],
+      "options": {
+        "cwd": "/usr/bin"
+      }
+    }
+  ]
+}
