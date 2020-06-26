@@ -35,14 +35,14 @@ vvl eye(int n){
 }
 
 void modPow(const vvl &A, ll n, ll p, vvl &ans){
-    if(n == 0){
-        ans = eye(A.size());
-    }else{
-        modPow(A, n/2, p, ans);
-        ans = multiply(ans, ans, p);
-        if(n%2 == 1){
-            ans = multiply(ans, A, p);
+    ans = eye(A.size());
+    auto P2 = A;
+    while(n){
+        if(n&1){
+            ans = multiply(ans, P2, p);
         }
+        n >>= 1;
+        P2 = multiply(P2, P2, p);
     }
 }
 
