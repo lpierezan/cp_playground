@@ -1,13 +1,11 @@
 #include <bits/stdc++.h>
 
 using namespace std;
-#define mp make_pair
 #define all(x) (x).begin(), (x).end()
 typedef vector<int> vi;
 typedef vector<vector<int>> vvi;
 typedef pair<int,int> pii;
 typedef long long ll;
-
 class Dijkstra{
 public:
     static vi solve(vector<vector<pii>> &g, int s, int target = -1){
@@ -18,7 +16,7 @@ public:
         vi dist(n, -1);
         vector<bool> used(n, false);
         set<pii> S;
-        S.insert(mp(0, s));
+        S.insert({0,s});
         
         while(!S.empty()){
             auto min_data = *S.begin();
@@ -42,9 +40,9 @@ public:
                     continue;                    
                 if(dist[u] == -1 || (dist[v]+w < dist[u])){
                     if(dist[u] != -1)
-                        S.erase(mp(dist[u],u));
+                        S.erase({dist[u],u});
                     dist[u] = dist[v] + w;
-                    S.insert(mp(dist[u],u));
+                    S.insert({dist[u],u});
                 }
             }
         }
