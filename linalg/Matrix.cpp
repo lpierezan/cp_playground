@@ -10,22 +10,23 @@ typedef vector<vector<long long>> vvl;
 typedef pair<int,int> pii;
 typedef long long ll;
 
-vvl multiply(const vvl &A, const vvl&B, ll p){
+// A *= B
+int maxn = 2, maxm = 2;
+vvl buf(maxn, vl(maxm));
+void multiply(vvl &A, const vvl&B, ll p){
     int n = A.size();
     int m = B[0].size();
-    int c = A[0].size();
-    vvl ans(n, vl(m,0));
-
+    int c = A[0].size();    
     for(int i=0;i<n;i++){
         for(int j=0;j<m;j++){
+            buf[i][j] = 0;
             for(int k=0;k<c;k++){
-                ans[i][j] += (A[i][k] * B[k][j])%p;
-                ans[i][j] %= p;
+                buf[i][j] += (A[i][k] * B[k][j])%p;
+                buf[i][j] %= p;
             }
         }
     }
-
-    return ans;
+    A = buf;
 }
 
 vvl eye(int n){
@@ -39,10 +40,10 @@ void modPow(const vvl &A, ll n, ll p, vvl &ans){
     auto P2 = A;
     while(n){
         if(n&1){
-            ans = multiply(ans, P2, p);
+            multiply(ans, P2, p);
         }
         n >>= 1;
-        P2 = multiply(P2, P2, p);
+        multiply(P2, P2, p);
     }
 }
 
@@ -85,9 +86,9 @@ class Matrix{
         return s;
     }
     
-    Matrix operator*(const Matrix &B){
+    void operator*=(const Matrix &B){
         assert(m == B.n);
-        return Matrix(::multiply(G, B.G, p));
+        multiply(G, B.G, p);
     }
 	
     static Matrix eye(int n){
@@ -106,7 +107,7 @@ ll Matrix::p{1000000000}; //10^9
 int main(){
     Matrix A(vvl{{0,1}, {1,1}});
     
-    cout << (A^100000) << endl;
+    cout << (A^1000) << endl;
     
     return 0;
 }
