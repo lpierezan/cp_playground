@@ -17,9 +17,7 @@ void debugF(ostream &os, Head H, Tail... T) { os << " " << H; debugF(os, T...); 
 template<typename T> istream &operator>>(istream &is, vector<T> &v){ for (auto &x : v) is >> x; return is; }
 template<typename T> ostream &operator<<(ostream &os, vector<T> &v){ for(int i = 0; i < v.size(); os << (i>0 ? " ":"") << v[i++]); return os;}
 
-class BIT
-{
-    public:
+struct BIT{
     vi bit;
     int n;
 

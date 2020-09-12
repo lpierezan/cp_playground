@@ -1,151 +1,309 @@
+#include <bits/stdc++.h>
 
 #include <bits/stdc++.h>
 
 using namespace std;
-#define mp make_pair
-typedef vector<int> vi;
-typedef pair<int, int> pii;
-const int INF = (1 << 30);
 typedef long long ll;
+#define all(x) (x).begin(), (x).end()
+typedef vector<bool> vb;
+typedef vector<int> vi;
+typedef vector<ll> vl;
+typedef vector<vector<bool>> vvb;
+typedef vector<vector<int>> vvi;
+typedef vector<vector<ll>> vvl;
+typedef pair<int,int> pii;
+typedef pair<ll,ll> pll;
+void debugF(ostream &os) {os << endl;}
+template <typename Head, typename... Tail>
+void debugF(ostream &os, Head H, Tail... T) { os << " " << H; debugF(os, T...); }
+#define debug(...) cout << "[" << #__VA_ARGS__ << "]:", debugF(cout, __VA_ARGS__)
+template<typename T> istream &operator>>(istream &is, vector<T> &v){ for (auto &x : v) is >> x; return is; }
+template<typename T> ostream &operator<<(ostream &os, vector<T> &v){ for(int i = 0; i < v.size(); os << (i>0 ? " ":"") << v[i++]); return os;}
 
-class SegTree
-{
+struct SegTree{
+    /*
+        Range Min Queries
+        - root at vertex 1
+    */
 
-  private:
-    class Node{
-        /*
-            x: is max interval value
-            add: lazy interval add part
-        */
-        void merge_info(){
-            //assert (add == 0);
-            if(ln != nullptr){
-                auto ldata = ln->x + ln->add;
-                auto rdata = rn->x + rn->add;
-                x = max(ldata,rdata);
-            }
-        }
+    struct Data
+    {
+        int val;
+        Data(int x) : val(x) {};
+        Data() : Data(0) {};
 
-      public:
-        Node *ln, *rn;
-        ll x, add;
-        
-        Node(ll x){
-            this->x = x;
-            this->add = 0;
-            this->ln = this->rn = nullptr;
-        }
-
-        Node(Node *ln, Node *rn){
-            this->add = 0;
-            this->ln = ln;
-            this->rn = rn;
-            this->merge_info();
-        }
-
-        void norm(){
-            if(ln != nullptr){
-                ln->add += add;
-                rn->add += add;
-            }else{
-                x += add;
-            }
-            add = 0;
-            merge_info();
+        static Data combine(Data *ln, Data *rn){
+            if(ln == nullptr) return *rn;
+            if(rn == nullptr) return *ln;
+            auto val = min(ln->val, rn->val);
+            return Data(val);
         }
     };
-    
-    Node* init(vector<ll> &v, int l, int r)
-    {
-        if (l == r)
-            return new Node(v[l]);
 
-        int k = l + (r - l) / 2;
-        Node *ln = init(v, l, k);
-        Node *rn = init(v, k+1, r);
-        return new Node(ln, rn);
+    vector<Data> t;
+    int n;
+
+    SegTree(vi &a){
+        n = a.size();
+        t.resize(4*n);
+        build(a, 1, 0, n-1);
     }
 
-    ll merge_query(ll *lret, ll *rret){
-        //assert(lret != nullptr || rret != nullptr);
-
-        if(lret == nullptr)
-            return *rret;
-        if(rret == nullptr)
-            return *lret;
-
-        return max(*lret, *rret);
-    }
-
-    //query interval [i,j] in current node [l, r]
-    ll query(Node *curr, int l, int r, int i, int j)
-    {
-        curr->norm();
-        
-        if (l >= i && r <= j)
-            return curr->x;
-
-        int k = l + (r - l) / 2;
-
-        ll *lret = nullptr, *rret = nullptr;
-
-        //[l,k] \inter [i,j]
-        if (k >= i && l <= j)
-            lret = new ll(query(curr->ln, l, k, i, j));
-        
-        //[k+1,r] \inter [i,j]
-        if (k + 1 <= j && r >= i)
-            rret = new ll(query(curr->rn, k+1,r,i,j));
-        
-        //merge query
-        auto ret = merge_query(lret, rret);
-        return ret;
-    }
-
-    void add(Node *curr, ll k, int i, int j, int l, int r){
-        if(j < l || i > r) return;
-        
-        if(l >= i && r <= j){
-            // [l,r] inside [i,j]
-            curr->add += k;
-        }else{
-            int m = l + (r - l) / 2;
-            add(curr->ln, k, i, j, l, m);
-            add(curr->rn, k, i, j, m+1, r);
+    void build(vi &a, int v, int lt, int rt){
+        if(lt == rt){
+            t[v] = Data(a[lt]);
+            return;
         }
-        curr->norm();
+        int md = lt + (rt - lt)/2;
+        build(a, 2*v, lt, md);
+        build(a, 2*v+1, md+1, rt);
+        t[v] = Data::combine(&t[2*v], &t[2*v + 1]);
     }
+
+    Data query(int v, int lt, int rt, int l, int r){
+        if(lt == l && rt == r){
+            return t[v];
+        }
+        int md = lt + (rt - lt)/2;
+        Data *lp = nullptr, *rp = nullptr;
+        Data ln, rn;
+        if(l <= md){
+            ln = query(2*v, lt, md, l, min(md,r));
+            lp = &ln;
+        }
+        if(r >= md+1){
+            rn = query(2*v+1, md+1, rt, max(md+1,l), r);
+            rp = &rn;
+        }
+        auto ans = Data::combine(lp, rp);
+        return ans;
+    }
+
+    void updateValue(int v, int lt, int rt, int pos, int value){
+        if(lt == rt){
+            t[v] = Data(value);
+            return;
+        }
+        int md = lt + (rt - lt)/2;
+        if(pos <= md){
+            updateValue(2*v, lt, md, pos, value);
+        }else{
+            updateValue(2*v+1, md+1, rt, pos, value);
+        }
+        t[v] = Data::combine(&t[2*v], &t[2*v+1]);
+    }
+};
+
+
+struct SegTreeLazy{
+    /*
+        Range Min Queries with range sum query
+        - root at vertex 1
+    */
+
+    struct Data{
+        // val : min value disregarding lz
+        ll val;
+        ll lz;
+        Data(ll val, ll lz = 0) : val(val) , lz(lz) {}
+        Data() : Data(0,0) {}
+
+        static Data combine(Data *ln, Data *rn){
+            if(ln == nullptr) return *rn;
+            if(rn == nullptr) return *ln;
+            // merge intervals
+            auto val = min(ln->val + ln->lz, rn->val + rn->lz);
+            return Data(val);
+        }
+    };
+
+    vector<Data> t;
+    int n;
+
+    SegTreeLazy(vl &a){
+        n = a.size();
+        t.resize(4*n);
+        build(a, 1, 0, n-1);
+    }
+
+    void push(int v, int lt, int rt){
+        if(lt < rt){ //non-leaf
+            t[2*v].lz += t[v].lz;
+            t[2*v+1].lz += t[v].lz;
+            t[v] = Data::combine(&t[2*v],&t[2*v + 1]);
+        }else{
+            t[v].val += t[v].lz;
+        }
+        t[v].lz = 0;
+    }
+
+    void build(vl &a, int v, int lt, int rt){
+        if(lt == rt){
+            t[v] = Data(a[lt]);
+            return;
+        }
+        int md = lt + (rt - lt)/2;
+        build(a, 2*v, lt, md);
+        build(a, 2*v + 1, md+1, rt);
+        t[v] = Data::combine(&t[2*v], &t[2*v + 1]);
+    }
+
+    Data query(int v, int lt, int rt, int l, int r){
+        push(v, lt, rt);
+        if(lt == l && rt == r){
+            return t[v];
+        }
+        int md = lt + (rt - lt)/2;
+        Data *lp = nullptr, *rp = nullptr;
+        Data ln, rn;
+        if(l <= md){
+            ln = query(2*v, lt, md, l, min(md,r));
+            lp = &ln;
+        }
+        if(r >= md+1){
+            rn = query(2*v+1, md+1, rt, max(md+1,l), r);
+            rp = &rn;
+        }
+        auto ans = Data::combine(lp, rp);
+        return ans;
+    }
+
+    void updateRange(int v, int lt, int rt, int l, int r, ll add){
+        if(l > r) return;
+        push(v, lt, rt);
+        if(lt == l && rt == r){
+            t[v].lz += add;
+            return;
+        }
+        int md = lt + (rt - lt)/2;
+        updateRange(2*v, lt, md, l, min(md,r), add);
+        updateRange(2*v + 1, md+1, rt, max(md+1,l), r, add);
+        t[v] = Data::combine(&t[2*v], &t[2*v+1]);
+    }
+
+    ll query(int l, int r = -1){
+        if(r == -1) r = n-1;
+        return query(1, 0, n-1, l, r).val;
+    }
+
+    void updateRange(ll value, int l, int r = -1){
+        if(r == -1) r = n-1;
+        updateRange(1, 0, n-1, l, r, value);
+    }
+};
+
+struct SegTreeP{
+    /*
+        Range Min Queries
+    */
+
+    struct Data{
+        ll x, add;
+        Data(ll x, ll add = 0) : x(x), add(add) {}
+        Data() : Data(0) {}
+
+        static Data combine(Data *dl, Data *dr){
+            if(dl == nullptr) return *dr;
+            if(dr == nullptr) return *dl;
+            ll newX = min(dl->x + dl->add , dr->x + dr->add);
+            return Data(newX);
+        }
+    };
+
+    struct Node{
+        Node *lp, *rp;
+        Data data;
+        
+        Node() : lp(nullptr) , rp(nullptr) , data(0) {};
+
+        Node(ll value) : Node() {
+            data.x = value;
+            data.add = 0;
+        }
+        
+        Node(Node *lp, Node *rp) : lp(lp), rp(rp) {
+            data = Data::combine(&(lp->data), &(rp->data));
+        }
+
+        void push(){
+            if(lp != nullptr){
+                lp->data.add += data.add;
+                rp->data.add += data.add;
+                data = Data::combine(&(lp->data), &(rp->data));
+            }else{
+                data.x += data.add;
+            }
+            data.add = 0;
+        }
+    };
 
     int n;
     Node *root = nullptr;
+    
+    Node* build(vl &a, int l, int r){
+        if (l == r) return new Node(a[l]);
+        int k = l + (r - l) / 2;
+        Node *ln = build(a, l, k);
+        Node *rn = build(a, k+1, r);
+        return new Node(ln, rn);
+    }
+
+    Data query(Node *v, int lt, int rt, int l, int r)
+    {
+        v->push();
+        if(l == lt && r == rt){
+            return v->data;
+        }
+        int md = lt + (rt - lt) / 2;
+        Data ld,rd;
+        Data *lp = nullptr, *rp = nullptr;
+        if(l <= md){
+            ld = query(v->lp, lt, md, l, min(md, r));
+            lp = &ld;
+        }
+        if(r >= md+1){
+            rd = query(v->rp, md+1, rt, max(md+1, l), r);
+            rp = &rd;
+        }
+        auto ret = Data::combine(lp, rp);
+        return ret;
+    }
+
+    void updateRange(Node *v, int lt, int rt, int l, int r, ll value){
+        if(l > r) return;
+        v->push();
+        if(l == lt && r == rt){
+            v->data.add += value;
+            return;
+        }
+        int md = lt + (rt - lt) / 2;
+        updateRange(v->lp, lt, md, l, min(md, r), value);
+        updateRange(v->rp, md+1, rt, max(md+1, l), r, value);
+        v->data = Data::combine(&(v->lp->data), &(v->rp->data));
+    }
 
     void clean(Node *v){
         if(v == nullptr) return;
-        clean(v->ln);
-        clean(v->rn);
+        clean(v->lp);
+        clean(v->rp);
         delete v;
     }
 
-  public:
-
-    SegTree(vector<ll> &v){
-        this->n = v.size();
-        this->root = init(v, 0, n-1);
+    SegTreeP(vl &a){
+        this->n = a.size();
+        this->root = build(a, 0, n-1);
     }
 
-    ~SegTree(){ clean(root); }
+    ~SegTreeP(){ clean(root); }
 
-    // max element in [i,j]
-    ll query(int i = 0, int j = -1)
-    {
-        if(j == -1) j = n-1;
-        return query(root, 0, n-1, i, j);
+    ll query(int l, int r = -1){
+        if(r == -1) r = n-1;
+        return query(root, 0, n-1, l, r).x;
     }
 
-    // adds k in for all values in [i,j]
-    void add(ll k, int i, int j = -1){
-        if(j == -1) j = n-1;
-        add(root, k, i, j, 0, n-1);
+    void updateRange(ll value, int l, int r = -1){
+        if(r == -1) r = n-1;
+        updateRange(root, 0, n-1, l, r, value);
     }
   
 };
@@ -173,12 +331,13 @@ void test_code_1(){
     for(int _ = 0; _ < ntest; _++){
         cout << "Test " << _ << endl;
         
-        vector<ll> v(vsize);
+        vl v(vsize);
         generate(v.begin(), v.end(), [&]() ->  ll { return vdist(generator);});
 
         //print_v(v);
 
-        SegTree t = SegTree(v);
+        // auto t = SegTreeP(v);
+        auto t = SegTreeLazy(v);
 
         cout << "Starting queries..." << endl;
 
@@ -191,15 +350,15 @@ void test_code_1(){
             if(qdist(generator)){
                 //add
                 ll add = vdist(generator);
-                t.add(add, iq, jq);
-                transform(&v[iq], &v[jq+1], &v[iq], [=](ll x) -> ll {return x + add;});
+                t.updateRange(add, iq, jq);
+                transform(v.begin() + iq, v.begin() + jq + 1, v.begin() + iq, [=](ll x) -> ll {return x + add;});
                 cout << "query: add " << add << " in [" << iq << "," << jq << "]" << endl;
                 //print_v(v);
             }else{
                 //query
-                cout << "query: max in [" << iq << "," << jq << "]" << endl;
+                cout << "query: min in [" << iq << "," << jq << "]" << endl;
                 auto t_ans = t.query(iq,jq);
-                auto ans = *max_element(&v[iq], &v[jq+1]);
+                auto ans = *min_element(v.begin()+iq, v.begin()+jq+1);
                 cout << "t_ans = " << t_ans << " ans = " << ans << endl;
                 
                 if(t_ans != ans){
