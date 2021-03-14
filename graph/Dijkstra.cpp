@@ -69,8 +69,8 @@ int main(){
             int v,u,w;
             cin >> v >> u >> w;
             v--;u--;
-            g[v].push_back(mp(u,w));
-            g[u].push_back(mp(v,w));
+            g[v].push_back({u,w});
+            g[u].push_back({v,w});
         }
 
         vi dist;
