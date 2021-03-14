@@ -72,7 +72,7 @@ template<class T> bool modularEqSolver(T a, T b, T n, T& x){
         return false;
     }
     x = (x0%n + n)%n;
-    //x = (x0 + n)%n;
+    x %= (n/g);
     // all solutions: x + i*(n/g) , for i in 0..g-1
     return true;
 }
@@ -352,7 +352,7 @@ void testPhi(){
 
 int main(){
     
-    testDiscreteLog();
+    //testDiscreteLog();
     //testCRT();
     //testPhi();
     //testInvRange();
