@@ -2,27 +2,29 @@
 
 using namespace std;
 #define all(x) (x).begin(), (x).end()
+typedef long long ll;
 typedef vector<int> vi;
+typedef vector<ll> vl;
 typedef vector<vector<int>> vvi;
 typedef pair<int,int> pii;
-typedef long long ll;
+
 class Dijkstra{
 public:
-    static vi solve(vector<vector<pii>> &g, int s, int target = -1){
+    static vl solve(vector<vector<pii>> &g, int s, int target = -1){
         //g[v] = list of (u,w) , where v->u with weight w.
         int n = g.size();
         assert(s >= 0 && s < n);
 
-        vi dist(n, -1);
+        vl dist(n, -1);
         vector<bool> used(n, false);
-        set<pii> S;
+        set<pair<ll,int>> S;
         S.insert({0,s});
         
         while(!S.empty()){
             auto min_data = *S.begin();
             S.erase(S.begin());
 
-            int min_dist = min_data.first;
+            ll min_dist = min_data.first;
             int v = min_data.second;
             dist[v] = min_dist;
             used[v] = true;
@@ -73,8 +75,7 @@ int main(){
             g[u].push_back({v,w});
         }
 
-        vi dist;
-        dist = Dijkstra::solve(g, s, t);
+        auto dist = Dijkstra::solve(g, s, t);
         if(dist[t] < 0){
             cout << "NONE" << endl;
         }else{
